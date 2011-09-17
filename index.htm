@@ -10,67 +10,64 @@
 			<script type="text/javascript">
 				$(document).ready(function(){
 					$("#categories").load("cats.php");
-
-					// $("button").click(function(){
-    	// 			$("#about").load('foo.php');
-  					});
-				// });
+					$("#load").click(function(){
+						if (window.lat == null || window.lon == null) {
+							alert("Select an area on the map.");
+						} else if (window.catID == null) {
+							alert("Select a category.");
+						} else {
+							alert("well, you did it all right. good job.");
+						};
+						// $("#about").load('foo.php');
+					});
+				});
 			</script>
 	</head>
+
 <body>
-<div id="container">
-	<div id="content">
-		<h2>
-			Choose a Category:
-		</h2>
+	<div id="container">
+		<div id="content">
+			<h2>
+				Choose a Category:
+			</h2>
+			<p id="categories"></p>
 
-<p id="categories"></p>
-		<h2>
-			Choose an Area:
-		</h2>
-		<div id="map" style="width: 600px; height: 400px"></div>
+			<h2>
+				Choose an Area:
+			</h2>
+			<div id="map" style="width: 600px; height: 400px"></div>
 			<script>
-    	//<![CDATA[
+				//<![CDATA[
+					var baseLink = "#";
+					var map = new GMap(document.getElementById("map"));
+					map.centerAndZoom(new GPoint(-73.99112, 40.72880), 6);
+					map.setUIToDefault();
+					var point = new GPoint(-73.99112, 40.72880);
+					var marker = new GMarker(point);
 
-		var baseLink = "#";
-    	var map = new GMap(document.getElementById("map"));
-    	map.centerAndZoom(new GPoint(-73.99112, 40.72880), 6);
- 		map.setUIToDefault();
-    	var point = new GPoint(-73.99112, 40.72880);
-    	var marker = new GMarker(point);
- 		
-    	GEvent.addListener(map, 'click', function(overlay, point) {
- 
-       	if (overlay) {
-            map.removeOverlay(overlay);
-       	} else if (point) {
-			map.recenterOrPanToLatLng(point);
-			var marker = new GMarker(point);
-			map.addOverlay(marker);
-		}
-	});
-	GEvent.addListener(map, 'click', function(overlay, point) {
-			if (window.catID == null) {
-				alert("Select a category first.");
-			} else {
-				alert("Lat: " +point.y + "Lon: " +point.x+ "Cat: "+window.catID);
-			}
-		
-			// document.getElementById("gogogo").href = baseLink + "?lat=" + point.y + "&lon=" + point.x + categories.value ;
-		});
-    //]]>
-	</script>
+					GEvent.addListener(map, 'click', function(overlay, point) {
+					if (overlay) {
+						map.removeOverlay(overlay);
+					} else if (point) {
+						map.recenterOrPanToLatLng(point);
+						var marker = new GMarker(point);
+						map.addOverlay(marker);
+					}
+					});
 
+					GEvent.addListener(map, 'click', function(overlay, point) {
+						window.lat = point.y;
+						window.lon = point.x;
+					});
+				//]]>
+			</script>
 
-	<p id="about">About</p>
-
-	<button>Change Content</button>
-
+			<button id="load">Search Venues</button>
+			<p id="about"><a href="about.htm">About</a></p>
+		</div>
 	</div>
-</div>
 
-<div class="botright">
-  <p><a href="http://www.youtube.com/watch?v=RE0DwzmrVQc#t=674s">π</a></p>
-
-</div>
+	<div class="botright">
+  		<p><a href="http://www.youtube.com/watch?v=RE0DwzmrVQc#t=674s">π</a></p>
+	</div>
 </body>
