@@ -1,0 +1,42 @@
+body {
+	background-image:url(bg.png);
+	background-repeat:no-repeat;
+	background-attachment:fixed;
+}
+
+#container
+{
+	margin: 0 auto;
+	width: 650px;
+	background:#fff;
+	opacity: 0.9;
+	overflow: auto;
+}
+
+#content
+{
+	clear: left;
+	padding: 20px;
+}
+
+#content h2
+{
+	color:#000;
+	font-size: 160%;
+	margin: 0 0 .5em;
+}
+
+#about
+{	
+	float:right;
+
+}
+
+ div.botright{
+    display:block;
+
+    /*set the div in the bottom right corner*/
+    position:absolute;
+    bottom:0;
+    right:0;
+    width:10px;
