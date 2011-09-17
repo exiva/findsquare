@@ -34,8 +34,6 @@ body {
 
  div.botright{
     display:block;
-
-    /*set the div in the bottom right corner*/
     position:absolute;
     bottom:0;
     right:0;
