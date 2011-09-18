@@ -11,7 +11,7 @@
 				$(document).ready(function(){
 					$("#categories").load("cats.php");
 					$("#load").click(function(){
-						if (window.lat == null || windo5w.lon == null) {
+						if (window.lat == null || window.lon == null) {
 							alert("Select an area on the map.");
 						} else if (window.catID == null) {
 							alert("Select a category.");
@@ -19,7 +19,7 @@
 							if (searched==1) {
 								document.getElementById('venueList').innerHTML = "";
 							};
-							$("#venuelist").load('venues.php');
+							$("#venuelist").load('venues.php?lat='+window.lat+'&lon='+window.lon+'&cat='+window.catID);
 							var searched = "1";
 						};
 					});
