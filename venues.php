@@ -17,7 +17,7 @@ for($i=0;$i<sizeof($venue_arr['venues']);$i++) {
 	if(isset($venue_arr['venues'][$i]['location']['crossStreet'])) { $crossSt = "(".$venue_arr['venues'][$i]['location']['crossStreet'].")"; } else { $missing=True; $crossSt = "(<strong>Missing Cross Street</strong>)"; }
 	if(isset($venue_arr['venues'][$i]['location']['address'])) { $address=$venue_arr['venues'][$i]['location']['address']; } 				else { $missing=True; $address="<strong>Missing Address</strong>"; }
 	if(isset($venue_arr['venues'][$i]['location']['city'])) { $city=$venue_arr['venues'][$i]['location']['city'].", "; } 				else { $missing=True; $city="<strong>Missing City</strong>"; }
-	if(isset($venue_arr['venues'][$i]['location']['state'])) { $state=$venue_arr['venues'][$i]['location']['state']; } 					else { $missing=True; $state="<strong>Missing State"; }
+	if(isset($venue_arr['venues'][$i]['location']['state'])) { $state=$venue_arr['venues'][$i]['location']['state']; } 					else { $missing=True; $state="<strong>Missing State</strong>"; }
 	if(isset($venue_arr['venues'][$i]['location']['postalCode'])) { $zip=$venue_arr['venues'][$i]['location']['postalCode']; } 				else { $missing=True; $zip="<strong>Missing Postal Code</strong>"; }
 
 	//throw in a notice to edit if some data is missing.
