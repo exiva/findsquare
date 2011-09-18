@@ -63,6 +63,6 @@ for($i=0;$i<sizeof($venue_arr['venues']);$i++) {
 	print "<a href=\"https://foursquare.com/v/".$id."\">Open Venue</a>";
 	print "</p>";
 	
-	print "<hr>";
+	if ($i != sizeof($venue_arr['venues'])-1 ) { print "<hr>"; }
 }
 ?>
