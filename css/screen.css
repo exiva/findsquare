@@ -1,4 +1,6 @@
 body {
+	font-family: Helvetica, Verdana, Arial, sans-serif;
+	font-size: 13px;
 	background-image:url(bg.png);
 	background-repeat:no-repeat;
 	background-attachment:fixed;
@@ -7,6 +9,7 @@ body {
 #container
 {
 	margin: 0 auto;
+	margin-top: -10px;
 	width: 650px;
 	background:#fff;
 	opacity: 0.9;
@@ -19,6 +22,14 @@ body {
 	padding: 20px;
 }
 
+#content h1
+{
+	color:#000;
+	font-size: 160%;
+	margin: 0 0 .5em;
+	margin-top: -10px;
+}
+
 #content h2
 {
 	color:#000;
@@ -26,10 +37,16 @@ body {
 	margin: 0 0 .5em;
 }
 
+#built
+{	
+	font-size: .8em;
+	float:left;
+}
+
 #about
 {	
+	font-size: .8em;
 	float:right;
-
 }
 
  div.botright{
