@@ -8,9 +8,26 @@
 			<script src="http://maps.google.com/maps?file=api&amp;v=2&amp;sensor=false&amp;key=ABQIAAAADvX7JTQepUAsPqvc7tt61hSaI6nr3FIZupmt7q9pPJlCdwl6thRh5b_qNMis4C5tEcV798TD-5PLRg" type="text/javascript"></script>
 			<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.js"></script>
 			<script type="text/javascript">
+				function updateMap(address) {
+					var geocoder = new GClientGeocoder();
+					geocoder.getLatLng(address, goToMap);
+				};
+
+				function goToMap(latlng) {
+					if (!latlng) {
+						alert(address+' Not found');
+					} else {
+						map.clearOverlays();
+						map.setCenter(latlng, 13);
+						var marker = new GMarker(latlng, {draggable: true});
+						map.addOverlay(marker);
+						window.lat = marker.getPoint().y;
+						window.lon = marker.getPoint().x;
+					}					
+				}
 				$(document).ready(function(){
 					$("#categories").load("cats.php");
-					$("#load").click(function(){
+						$("#load").click(function(){
 						if (window.lat == null || window.lon == null) {
 							alert("Select an area on the map.");
 						} else if (window.catID == null) {
@@ -38,32 +55,31 @@
 			<h2>
 				Choose an Area:
 			</h2>
-			<div id="map" style="width: 600px; height: 400px"></div>
+
+			<input type="text" name="zipcode" value="Enter a zip Code" id="zip" />
+			<button id="remap" onclick="updateMap(document.getElementById('zip').value)">Go</button>
+			<div id="map_canvas" style="width: 600px; height: 400px"></div>
 			<script>
 				//<![CDATA[
-					var baseLink = "#";
-					var map = new GMap(document.getElementById("map"));
-					map.centerAndZoom(new GPoint(-73.99112, 40.72880), 6);
-					map.setUIToDefault();
-					var point = new GPoint(-73.99112, 40.72880);
-					var marker = new GMarker(point);
 
-					GEvent.addListener(map, 'click', function(overlay, point) {
-					if (overlay) {
-						map.removeOverlay(overlay);
-					} else if (point) {
-						map.recenterOrPanToLatLng(point);
-						var marker = new GMarker(point);
-						map.addOverlay(marker);
-					}
-					});
+				var map = new GMap2(document.getElementById("map_canvas"));
+				var center = new GLatLng(40.72880, -73.99112);
+				map.setUIToDefault();
+				map.setCenter(center, 13);
+				var marker = new GMarker(center, {draggable: true});
+				window.lat = marker.getPoint().y;
+				window.lon = marker.getPoint().x;
 
-					GEvent.addListener(map, 'click', function(overlay, point) {
-						window.lat = point.y;
-						window.lon = point.x;
-					});
+				GEvent.addListener(marker, "dragend", function(overlay, point) {
+					window.lat = marker.getPoint().y;
+					window.lon = marker.getPoint().x;
+		        });
+
+		        map.addOverlay(marker);
 				//]]>
 			</script>
+
+			
 
 			<button id="load">Search Venues</button>
 
