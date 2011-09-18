@@ -4,21 +4,24 @@
 	<head>
 		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 		<title>4sq thingy xxxxxx</title>
-			<link rel="stylesheet" href="screen.css" type="text/css" media="screen" charset="utf-8" />
+			<link rel="stylesheet" href="css/screen.css" type="text/css" media="screen" charset="utf-8" />
 			<script src="http://maps.google.com/maps?file=api&amp;v=2&amp;sensor=false&amp;key=ABQIAAAADvX7JTQepUAsPqvc7tt61hSaI6nr3FIZupmt7q9pPJlCdwl6thRh5b_qNMis4C5tEcV798TD-5PLRg" type="text/javascript"></script>
 			<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.js"></script>
 			<script type="text/javascript">
 				$(document).ready(function(){
 					$("#categories").load("cats.php");
 					$("#load").click(function(){
-						if (window.lat == null || window.lon == null) {
+						if (window.lat == null || windo5w.lon == null) {
 							alert("Select an area on the map.");
 						} else if (window.catID == null) {
 							alert("Select a category.");
 						} else {
-							alert("well, you did it all right. good job.");
+							if (searched==1) {
+								document.getElementById('venueList').innerHTML = "";
+							};
+							$("#venuelist").load('venues.php');
+							var searched = "1";
 						};
-						// $("#about").load('foo.php');
 					});
 				});
 			</script>
@@ -63,6 +66,9 @@
 			</script>
 
 			<button id="load">Search Venues</button>
+
+			<div id="venuelist"></div>
+
 			<p id="about"><a href="about.htm">About</a></p>
 		</div>
 	</div>
