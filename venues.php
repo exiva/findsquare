@@ -4,7 +4,7 @@ $lon = $_GET['lon'];
 $catID = $_GET['cat'];
 $oauth = "HVBP350OQHKOOCN0VD1ZS30VK5EWRDD13XBBKI2GRR4CC2WV";
 
-$venue_json = file_get_contents("https://api.foursquare.com/v2/venues/search?ll=$lat,$lon&categoryId=$catID&oauth_token=$oauth&v=".date('Ydm'), true);
+$venue_json = file_get_contents("https://api.foursquare.com/v2/venues/search?ll=$lat,$lon&categoryId=$catID&radius=20000&oauth_token=$oauth&v=".date('Ydm'), true);
 $venue_json = json_decode($venue_json, true);
 $venue_arr  = $venue_json['response'];
 
