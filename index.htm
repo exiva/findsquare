@@ -50,13 +50,15 @@
 			<h1>
 				findsquare
 			</h1>
+			<p id="tagline">Help keep foursquare clean</p>
+
 			<h2>
-				Choose a Category:
+				Choose a Category to clean:
 			</h2>
 			<p id="categories"></p>
 
 			<h2>
-				Choose an Area:
+				Choose an Area to clean:
 			</h2>
 
 			<input type="text" name="zipcode" value="Enter a zip Code" id="zip" />
@@ -64,7 +66,6 @@
 			<div id="map_canvas" style="width: 600px; height: 400px"></div>
 			<script>
 				//<![CDATA[
-
 				var map = new GMap2(document.getElementById("map_canvas"));
 				var center = new GLatLng(40.72880, -73.99112);
 				map.setUIToDefault();
@@ -82,11 +83,10 @@
 				//]]>
 			</script>
 
-			
-
-			<button id="load">Search Venues</button>
+			<button id="load">Find Venues</button>
 
 			<div id="venuelist"></div>
+
 			<span>
 				<hr>
 				<p id="built">Built during foursquare Hackaton 2011 by <a href="http://twitter.com/exiva">@exiva</a>
