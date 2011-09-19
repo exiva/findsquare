@@ -22,6 +22,11 @@
 			</script>
 			<script type="text/javascript">
 				$(document).ready(function(){
+					if(window.location.hash) {
+						var hash_value = window.location.hash.replace('#', '').split('=')[1];
+						$.cookie('foursquare_hash', hash_value);
+					};
+
 					//load categories.
 					var cat_url = "https://api.foursquare.com/v2/venues/categories?oauth_token=HVBP350OQHKOOCN0VD1ZS30VK5EWRDD13XBBKI2GRR4CC2WV";
 					$.getJSON(cat_url,function(cat_json){
