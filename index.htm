@@ -8,6 +8,37 @@
 			<script src="http://maps.google.com/maps?file=api&amp;v=2&amp;sensor=false&amp;key=ABQIAAAADvX7JTQepUAsPqvc7tt61hSaI6nr3FIZupmt7q9pPJlCdwl6thRh5b_qNMis4C5tEcV798TD-5PLRg" type="text/javascript"></script>
 			<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.js"></script>
 			<script type="text/javascript">
+				$(document).ready(function(){
+					//load categories.
+					var cat_url = "https://api.foursquare.com/v2/venues/categories?oauth_token=HVBP350OQHKOOCN0VD1ZS30VK5EWRDD13XBBKI2GRR4CC2WV";
+					$.getJSON(cat_url,function(json){
+						if (json.meta.code == 200) {
+							document.getElementById('categories').innerHTML = "";
+							$("#categories").append('<option>Select a Category</option>');
+							$.each(json.response.categories, function(i, category) {
+								$("#categories").append('<optgroup label="'+category.name+'">');
+								$.each(category.categories, function(i, data) {
+									$("#categories").append('<option value="'+data.id+'">'+data.pluralName+'</option>');
+								});
+							});
+						};
+					});
+
+					$("#load").click(function(){
+						if (window.lat == null || window.lon == null) {
+							alert("Select an area on the map.");
+						} else if (window.catID == null) {
+							alert("Select a category.");
+						} else {
+							if (searched==1) {
+								document.getElementById('venueList').innerHTML = "";
+							};
+							$("#venuelist").load('venues.php?lat='+window.lat+'&lon='+window.lon+'&cat='+window.catID);
+							var searched = "1";
+						};
+					});
+				});
+
 				function updateMap(address) {
 					var geocoder = new GClientGeocoder();
 					geocoder.getLatLng(address, goToMap);
@@ -25,22 +56,6 @@
 						window.lon = marker.getPoint().x;
 					}					
 				}
-				$(document).ready(function(){
-					$("#categories").load("cats.php");
-						$("#load").click(function(){
-						if (window.lat == null || window.lon == null) {
-							alert("Select an area on the map.");
-						} else if (window.catID == null) {
-							alert("Select a category.");
-						} else {
-							if (searched==1) {
-								document.getElementById('venueList').innerHTML = "";
-							};
-							$("#venuelist").load('venues.php?lat='+window.lat+'&lon='+window.lon+'&cat='+window.catID);
-							var searched = "1";
-						};
-					});
-				});
 			</script>
 	</head>
 
@@ -56,7 +71,9 @@
 			<h2>
 				Choose a Category to clean:
 			</h2>
-			<p id="categories"></p>
+			<select id="categories" onChange="window.catID=this.value;">
+				<option>Loading....</option>
+			</select>
 
 			<h2>
 				Choose an Area to clean:
