@@ -6,21 +6,22 @@
 		<title>findsquare</title>
 			<link rel="stylesheet" href="css/screen.css" type="text/css" media="screen" charset="utf-8" />
 			<script src="http://maps.google.com/maps?file=api&amp;v=2&amp;sensor=false&amp;key=ABQIAAAADvX7JTQepUAsPqvc7tt61hSaI6nr3FIZupmt7q9pPJlCdwl6thRh5b_qNMis4C5tEcV798TD-5PLRg" type="text/javascript"></script>
-			<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.js"></script>
+			<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
+			<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js"></script>
 			<script type="text/javascript">
 				$(document).ready(function(){
 					//load categories.
 					var cat_url = "https://api.foursquare.com/v2/venues/categories?oauth_token=HVBP350OQHKOOCN0VD1ZS30VK5EWRDD13XBBKI2GRR4CC2WV";
-					$.getJSON(cat_url,function(json){
-						if (json.meta.code == 200) {
+					$.getJSON(cat_url,function(cat_json){
+						if (cat_json.meta.code == 200) {
 							document.getElementById('categories').innerHTML = "";
 							$("#categories").append('<option>Select a Category</option>');
-							$.each(json.response.categories, function(i, category) {
+							$.each(cat_json.response.categories, function(i, category) {
 								$("#categories").append('<optgroup label="'+category.name+'">');
 								$.each(category.categories, function(i, data) {
 									$("#categories").append('<option value="'+data.id+'">'+data.pluralName+'</option>');
 								});
-							});
+				 			});
 						};
 					});
 
@@ -33,7 +34,57 @@
 							if (searched==1) {
 								document.getElementById('venueList').innerHTML = "";
 							};
-							$("#venuelist").load('venues.php?lat='+window.lat+'&lon='+window.lon+'&cat='+window.catID);
+							//load venue datas.
+							var date = $.datepicker.formatDate('yymmdd', new Date())
+							var venue_url = "https://api.foursquare.com/v2/venues/search";
+							var oAuth = "HVBP350OQHKOOCN0VD1ZS30VK5EWRDD13XBBKI2GRR4CC2WV";
+							$.getJSON(venue_url+'?ll='+window.lat+','+window.lon+'&categoryId='+window.catID+'&radius=20000&oauth_token='+oAuth+'&v='+date, function(venue_json){
+								if (venue_json.meta.code == 200) {
+									var l = venue_json.response.venues.length;
+									$("#venuelist").append('<h2>Found '+l+' matching venues</h2>');
+									//run through the venues we found.
+									$.each(venue_json.response.venues, function(i, venue) {
+										var name = venue.name;
+										var address = venue.location.address;
+										var crossStreet = venue.location.crossStreet;
+										var city = venue.location.city;
+										var state = venue.location.state;
+										var zip = venue.location.postalCode;
+										var missing = false;
+										if (name==undefined) { missing=true; name="<strong>Missing Name</strong>"; };
+										if (address==undefined) { missing=true; address="<strong>Missing Address</strong>"; };
+										if (crossStreet==undefined) { missing=true; crossStreet="<strong>Missing Cross Street</strong>"; };
+										if (city==undefined) { missing=true; city="<strong>Missing City</strong>"; };
+										if (state==undefined) { missing=true; state="<strong>Missing State</strong>"; };
+										if (zip==undefined) { missing=true; zip="<strong>Missing Postal Code</strong>"}
+										
+										if (missing==true) {$("#venuelist").append('<p>This venue is missing some data, why not fix it? <a href="http://foursquare.com/v/'+venue.id+'/edit">Edit Venue</a></p>')};
+										$("#venuelist").append('<p><strong>'+name+'</strong><br />');
+										$("#venuelist").append(address+' ('+crossStreet+')<br />');
+										$("#venuelist").append(city+', '+state+' '+zip+'</p>');
+										$("#venuelist").append("<h3>In Categories:</h3><p>");
+										$.each(venue.categories, function(i, categories) {
+											var category = categories.pluralName;
+											var iconURL = categories.icon;
+											$("#venuelist").append('<img src="'+iconURL+'" alt="'+category+'" /> '+category+'<br />');
+
+										});
+										$("#venuelist").append('</p<p>');
+										
+										if (venue.location.city==undefined || venue.location.state==undefined) {
+											$("#venuelist").append('<a href="http://www.google.com/search?q='+encodeURI(name)+'">Google It!</a>');
+											$("#venuelist").append(' | <a href="http://www.yelp.com/search?find_desc='+encodeURI(name)+'&ns=1&find_loc=">Yelp It!</a>');
+											$("#venuelist").append(' | <a href="https://foursquare.com/v/'+venue.id+'">Open Venue</a></p>');
+										} else {
+											$("#venuelist").append('<a href="http://www.google.com/search?q='+encodeURI(name)+' near '+city+', '+state+'">Google It!</a>');
+											$("#venuelist").append(' | <a href="http://www.yelp.com/search?find_desc='+encodeURI(name)+'&ns=1&find_loc='+encodeURI(city+', '+state)+'">Yelp It!</a>');
+											$("#venuelist").append(' | <a href="https://foursquare.com/v/'+venue.id+'">Open Venue</a></p>');
+										};
+											
+										$("#venuelist").append('<hr>');
+									});
+								};
+							});
 							var searched = "1";
 						};
 					});
@@ -106,7 +157,6 @@
 			<div id="venuelist"></div>
 
 			<span>
-				<hr>
 				<p id="built">Built during foursquare Hackaton 2011 by <a href="http://twitter.com/exiva">@exiva</a>
 				<p id="about"><a href="about.htm">About</a></p>
 			</span>
