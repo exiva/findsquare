@@ -33,6 +33,9 @@
 						var oauth = $.cookie('foursquare_hash');
 					};
 
+					var date = $.datepicker.formatDate('yymmdd', new Date())
+					getLocation(oauth,date);
+
 					//load categories.
 					var cat_url = 'https://api.foursquare.com/v2/venues/categories?oauth_token='+oauth;
 					$.getJSON(cat_url,function(cat_json){
@@ -108,6 +111,16 @@
 						};
 					});
 				});
+
+				function getLocation(oAuth, date) {
+					var data_url = 'https://api.foursquare.com/v2/users/self?oauth_token='+oAuth+'&v='+date;
+					$.getJSON(data_url, function(profile_json){
+						if (profile_json.meta.code == 200) {
+							console.log(profile_json.response.user.homeCity);
+							updateMap(profile_json.response.user.homeCity);
+						};
+					});
+				}
 
 				function updateMap(address) {
 					var geocoder = new GClientGeocoder();
