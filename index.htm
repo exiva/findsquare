@@ -24,7 +24,7 @@
 				$(document).ready(function(){
 					if(window.location.hash) {
 						var hash_value = window.location.hash.replace('#', '').split('=')[1];
-						$.cookie('foursquare_hash', hash_value);
+						$.cookie('foursquare_hash', hash_value, { expires: 7 });
 					};
 
 					//load categories.
