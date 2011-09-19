@@ -31,14 +31,12 @@
 						} else if (window.catID == null) {
 							alert("Select a category.");
 						} else {
-							if (searched==1) {
-								document.getElementById('venueList').innerHTML = "";
-							};
 							//load venue datas.
 							var date = $.datepicker.formatDate('yymmdd', new Date())
 							var venue_url = "https://api.foursquare.com/v2/venues/search";
 							var oAuth = "HVBP350OQHKOOCN0VD1ZS30VK5EWRDD13XBBKI2GRR4CC2WV";
 							$.getJSON(venue_url+'?ll='+window.lat+','+window.lon+'&categoryId='+window.catID+'&radius=20000&oauth_token='+oAuth+'&v='+date, function(venue_json){
+								document.getElementById('venuelist').innerHTML = "";
 								if (venue_json.meta.code == 200) {
 									var l = venue_json.response.venues.length;
 									$("#venuelist").append('<h2>Found '+l+' matching venues</h2>');
@@ -85,7 +83,6 @@
 									});
 								};
 							});
-							var searched = "1";
 						};
 					});
 				});
