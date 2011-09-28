@@ -22,21 +22,34 @@
 			</script>
 			<script type="text/javascript">
 				$(document).ready(function(){
-					var date = $.datepicker.formatDate('yymmdd', new Date())
-					
 					if(window.location.hash) {
 						var hash_value = window.location.hash.replace('#', '').split('=')[1];
 						$.cookie('foursquare_hash', hash_value, { expires: 7 });
 					};
 
 					if ($.cookie('foursquare_hash') != undefined) {
-						//check if our oAuth token is valid.
+						// document.getElementById('search').style.display = "block";
+						// document.getElementById('loginarea').style.display = "none";
 						var oauth = $.cookie('foursquare_hash');
-						if (login(oauth,date)) {
-							document.getElementById('search').style.display = "block";
-							document.getElementById('loginarea').style.display = "none";
-						};
 					};
+
+					var date = $.datepicker.formatDate('yymmdd', new Date())
+					getLocation(oauth,date);
+
+					//load categories.
+					var cat_url = 'https://api.foursquare.com/v2/venues/categories?oauth_token='+oauth;
+					$.getJSON(cat_url,function(cat_json){
+						if (cat_json.meta.code == 200) {
+							document.getElementById('categories').innerHTML = "";
+							$("#categories").append('<option>Select a Category</option>');
+							$.each(cat_json.response.categories, function(i, category) {
+								$("#categories").append('<optgroup label="'+category.name+'">');
+								$.each(category.categories, function(i, data) {
+									$("#categories").append('<option value="'+data.id+'">'+data.pluralName+'</option>');
+								});
+				 			});
+						};
+					});
 
 					$("#load").click(function(){
 						if (window.lat == null || window.lon == null) {
@@ -44,10 +57,88 @@
 						} else if (window.catID == null) {
 							alert("Select a category.");
 						} else {
-							loadVenues(oauth, date);
-						}
+							//load venue datas.
+							var date = $.datepicker.formatDate('yymmdd', new Date())
+							var venue_url = "https://api.foursquare.com/v2/venues/search";
+							$.getJSON(venue_url+'?ll='+window.lat+','+window.lon+'&categoryId='+window.catID+'&radius=20000&oauth_token='+oauth+'&v='+date, function(venue_json){
+								document.getElementById('venuelist').innerHTML = "";
+								if (venue_json.meta.code == 200) {
+									var l = venue_json.response.venues.length;
+									$("#venuelist").append('<h2>Found '+l+' matching venues</h2>');
+									//run through the venues we found.
+									$.each(venue_json.response.venues, function(i, venue) {
+										var name = venue.name;
+										var address = venue.location.address;
+										var crossStreet = venue.location.crossStreet;
+										var city = venue.location.city;
+										var state = venue.location.state;
+										var zip = venue.location.postalCode;
+										var missing = false;
+										if (name==undefined) { missing=true; name="<strong>Missing Name</strong>"; };
+										if (address==undefined) { missing=true; address="<strong>Missing Address</strong>"; };
+										if (crossStreet==undefined) { missing=true; crossStreet="<strong>Missing Cross Street</strong>"; };
+										if (city==undefined) { missing=true; city="<strong>Missing City</strong>"; };
+										if (state==undefined) { missing=true; state="<strong>Missing State</strong>"; };
+										if (zip==undefined) { missing=true; zip="<strong>Missing Postal Code</strong>"}
+										
+										if (missing==true) {$("#venuelist").append('<p>This venue is missing some data, why not fix it? <a href="http://foursquare.com/v/'+venue.id+'/edit">Edit Venue</a></p>')};
+										$("#venuelist").append('<p><strong>'+name+'</strong><br />');
+										$("#venuelist").append(address+' ('+crossStreet+')<br />');
+										$("#venuelist").append(city+', '+state+' '+zip+'</p>');
+										$("#venuelist").append("<h3>In Categories:</h3><p>");
+										$.each(venue.categories, function(i, categories) {
+											var category = categories.pluralName;
+											var iconURL = categories.icon;
+											$("#venuelist").append('<img src="'+iconURL+'" alt="'+category+'" /> '+category+'<br />');
+
+										});
+										$("#venuelist").append('</p<p>');
+										
+										if (venue.location.city==undefined || venue.location.state==undefined) {
+											$("#venuelist").append('<a href="http://www.google.com/search?q='+encodeURI(name)+'">Google It!</a>');
+											$("#venuelist").append(' | <a href="http://www.yelp.com/search?find_desc='+encodeURI(name)+'&ns=1&find_loc=">Yelp It!</a>');
+											$("#venuelist").append(' | <a href="https://foursquare.com/v/'+venue.id+'">Open Venue</a></p>');
+										} else {
+											$("#venuelist").append('<a href="http://www.google.com/search?q='+encodeURI(name)+' near '+city+', '+state+'">Google It!</a>');
+											$("#venuelist").append(' | <a href="http://www.yelp.com/search?find_desc='+encodeURI(name)+'&ns=1&find_loc='+encodeURI(city+', '+state)+'">Yelp It!</a>');
+											$("#venuelist").append(' | <a href="https://foursquare.com/v/'+venue.id+'">Open Venue</a></p>');
+										};
+											
+										$("#venuelist").append('<hr>');
+									});
+								};
+							});
+						};
 					});
 				});
+
+				function getLocation(oAuth, date) {
+					var data_url = 'https://api.foursquare.com/v2/users/self?oauth_token='+oAuth+'&v='+date;
+					$.getJSON(data_url, function(profile_json){
+						if (profile_json.meta.code == 200) {
+							console.log(profile_json.response.user.homeCity);
+							updateMap(profile_json.response.user.homeCity);
+						};
+					});
+				}
+
+				function updateMap(address) {
+					var geocoder = new GClientGeocoder();
+					geocoder.getLatLng(address, goToMap);
+				};
+
+				function goToMap(latlng) {
+					if (!latlng) {
+						alert(address+' Not found');
+					} else {
+						map.clearOverlays();
+						map.setCenter(latlng, 13);
+						var marker = new GMarker(latlng, {draggable: true});
+						map.addOverlay(marker);
+						window.lat = marker.getPoint().y;
+						window.lon = marker.getPoint().x;
+					}					
+				}
 			</script>
 	</head>
 
@@ -56,21 +147,19 @@
 	<div id="container">
 		<div id="content">
 			<h1>
-				findsquare v2
+				findsquare
 			</h1>
-			<em>now more squarier!</em>
-			<p id="tagline">Help keep foursquare Categories and Explore clean.</p>
+			<p id="tagline">Help keep foursquare clean</p>
 
 			<div id="loginarea" style="display: block;">
 				<h2>
 					Login
 				</h2>
-				<a href="https://foursquare.com/oauth2/authenticate?client_id=VWPJQE0JZ1JQTXIQCPGQBC3GDRDKMEPDBD4LKMDHNU4EJ34T&response_type=token&redirect_uri=http://findsquare.exiva.net/dev/">
+				<a href="https://foursquare.com/oauth2/authenticate?client_id=VWPJQE0JZ1JQTXIQCPGQBC3GDRDKMEPDBD4LKMDHNU4EJ34T&response_type=token&redirect_uri=http://findsquare.exiva.net/t/">
 					<img src="css/connect-blue.png" />
 				</a>
 			</div>
 
-			<div id="search" style="display: none;">
 			<h2>
 				Choose a Category to clean:
 			</h2>
@@ -85,11 +174,28 @@
 			<input type="text" name="zipcode" value="Enter a zip Code" id="zip" />
 			<button id="remap" onclick="updateMap(document.getElementById('zip').value)">Go</button>
 			<div id="map_canvas" style="width: 600px; height: 400px"></div>
+			<script>
+				//<![CDATA[
+				var map = new GMap2(document.getElementById("map_canvas"));
+				var center = new GLatLng(40.72880, -73.99112);
+				map.setUIToDefault();
+				map.setCenter(center, 13);
+				var marker = new GMarker(center, {draggable: true});
+				window.lat = marker.getPoint().y;
+				window.lon = marker.getPoint().x;
+
+				GEvent.addListener(marker, "dragend", function(overlay, point) {
+					window.lat = marker.getPoint().y;
+					window.lon = marker.getPoint().x;
+		        });
+
+		        map.addOverlay(marker);
+				//]]>
+			</script>
 
 			<button id="load">Find Venues</button>
 
 			<div id="venuelist"></div>
-			</div>
 
 			<span>
 				<p id="built">Built during foursquare Hackaton 2011 by <a href="http://twitter.com/exiva">@exiva</a>
